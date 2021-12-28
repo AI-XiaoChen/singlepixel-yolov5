@@ -115,6 +115,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         with torch_distributed_zero_first(LOCAL_RANK):
             weights = attempt_download(weights)  # download if not found locally
         ckpt = torch.load(weights, map_location=device)  # load checkpoint
+        print("----ckpt:",ckpt)
         model = Model(cfg or ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
         exclude = ['anchor'] if (cfg or hyp.get('anchors')) and not resume else []  # exclude keys
         csd = ckpt['model'].float().state_dict()  # checkpoint state_dict as FP32
@@ -222,8 +223,9 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
 
     # Process 0
     if RANK in [-1, 0]:
-        val_loader = create_dataloader(val_path, imgsz, batch_size // WORLD_SIZE * 2, gs, single_cls,
-                                       hyp=hyp, cache=None if noval else opt.cache, rect=True, rank=-1,
+        # CHANGE
+        val_loader = create_dataloader(val_path, imgsz, batch_size // WORLD_SIZE, gs, single_cls,
+                                       hyp=hyp, cache=None if noval else opt.cache, rect=False, rank=-1,
                                        workers=workers, pad=0.5,
                                        prefix=colorstr('val: '),
                                        label_name=label_name)[0]
@@ -295,6 +297,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             pbar = tqdm(pbar, total=nb)  # progress bar
         optimizer.zero_grad()
         for i, (imgs, targets, paths, _) in pbar:  # batch -------------------------------------------------------------
+            # break
             ni = i + nb * epoch  # number integrated batches (since train start)
             imgs = imgs.to(device, non_blocking=True).float() / 255.0  # uint8 to float32, 0-255 to 0.0-1.0
 

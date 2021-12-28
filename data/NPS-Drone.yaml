@@ -1,12 +1,17 @@
 # train and val data as 1) directory: path/images/, 2) file: path/images.txt,
 # or 3) list: [path1/images/, path2/images/]
+# ubuntu
 train: /home/zzx/datasets/NPS-Drones/images/train
 val: /home/zzx/datasets/NPS-Drones/images/val
+# colab
+#train: /content/NPS/images/train
+#val: /content/NPS/images/val
 #train: /home/zzx/datasets/NPS-Drones/croped_images/train
 #val: /home/zzx/datasets/NPS-Drones/croped_images/val
 #train: /home/zzx/datasets/NPS-Drones-100/croped_images
 #val: /home/zzx/datasets/NPS-Drones-100/croped_images
-label_name: labels_box
+label_name: labels_box_new
+
 # number of classes
 nc: 1
 

@@ -467,3 +467,31 @@ class Classify(nn.Module):
     def forward(self, x):
         z = torch.cat([self.aap(y) for y in (x if isinstance(x, list) else [x])], 1)  # cat if list
         return self.flat(self.conv(z))  # flatten to x(b,c2)
+
+
+class Sp_EncodeAndDecode(nn.Module):
+
+    def __init__(self, input, sample_rate=0.03):
+        super().__init__()
+        self.input = input
+        self.sample_rate = sample_rate
+        self.feature = int(np.floor(input*sample_rate))
+        self.encode = nn.Linear(input, self.feature, bias=False)
+        self.decode = nn.Linear(self.feature, input, bias=False)# 加上bias试试
+
+    def forward(self, x):
+        b, c, h, w = x.shape
+        # print(x.shape)
+        x = x.view(b, c * h * w)  #
+        # print('----------')
+        # print(x.shape)
+        # print(self.input)
+        # print(self.feature)
+        x = self.encode(x)
+        # print(x.shape)
+        x = self.decode(x)
+        # print(x.shape)
+        x = x.view(b, c, h, w)
+        x = x.contiguous()
+        return x  #
+

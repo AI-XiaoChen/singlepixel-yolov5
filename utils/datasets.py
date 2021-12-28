@@ -387,7 +387,7 @@ class LoadImagesAndLabels(Dataset):
     def __init__(self, path, img_size=640, batch_size=16, augment=False, hyp=None, rect=False, image_weights=False,
                  cache_images=False, single_cls=False, stride=32, pad=0.0, prefix='', data_label_name="labels"):
         self.img_size = img_size
-        self.augment = augment
+        self.augment = augment  #
         self.hyp = hyp
         self.image_weights = image_weights
         self.rect = False if image_weights else rect
@@ -412,9 +412,15 @@ class LoadImagesAndLabels(Dataset):
                         # f += [p.parent / x.lstrip(os.sep) for x in t]  # local to global path (pathlib)
                 else:
                     raise Exception(f'{prefix}{p} does not exist')
+            #
             self.img_files = sorted([x.replace('/', os.sep) for x in f if x.split('.')[-1].lower() in IMG_FORMATS])
+            # for i in range(len(self.img_files))[::-1]:
+            #     imgi = Image.open(self.img_files[i])
+            #     # imgi = cv2.imread(self.img_files[i])
+            #     if imgi.size[0] != 1920:
+            #         del self.img_files[i]
             # 减少数据量
-            self.img_files = self.img_files[::3]
+            # self.img_files = self.img_files[::3]
             # self.img_files = sorted([x for x in f if x.suffix[1:].lower() in IMG_FORMATS])  # pathlib
             assert self.img_files, f'{prefix}No images found'
         except Exception as e:
@@ -471,6 +477,7 @@ class LoadImagesAndLabels(Dataset):
         if self.rect:
             # Sort by aspect ratio
             s = self.shapes  # wh
+            print(s)
             ar = s[:, 1] / s[:, 0]  # aspect ratio
             irect = ar.argsort()
             self.img_files = [self.img_files[i] for i in irect]
@@ -481,6 +488,7 @@ class LoadImagesAndLabels(Dataset):
 
             # Set training image shapes
             shapes = [[1, 1]] * nb
+
             for i in range(nb):
                 ari = ar[bi == i]
                 mini, maxi = ari.min(), ari.max()

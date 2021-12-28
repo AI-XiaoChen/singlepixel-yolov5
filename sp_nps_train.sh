@@ -8,13 +8,13 @@ data=data/VOC.yaml
 cfg=yolov5s_sp_320.yaml
 #cfg=yolov5s_sp.yaml
 
-
-weights='yolov5s.pt'
+weights=''
+#weights='yolov5s.pt'
 #weights='runs/train/nps_yolo_anchor/nps_320_50e/weights/last.pt'
 #weights='runs/train/voc_yolo/voc_320_300e/weights/last.pt'
 
 # basename and lastname
-basename='runs/train/voc_yolo'
+basename='runs/train/voc_yolo_noweight'
 ## colab
 #basename='/content/drive/MyDrive/runs/train'
 
@@ -32,8 +32,8 @@ workers=8
 #ismodified=True
 #ismodified= 'False'
 
-python train.py --data $data --cfg $cfg --batch-size $batch_size --weights $weights --name $name --epochs $epochs \
-  --imgsz $img_size --project $basename --workers $workers --exist-ok
+python train.py --data $data --cfg $cfg --batch-size $batch_size --weights '' --name $name --epochs $epochs \
+  --imgsz $img_size --project $basename --workers $workers --exist-ok --patience 0
 
 
 #function ClickConnect(){

@@ -8,7 +8,7 @@
 
 
 # Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
-path: ../datasets/VOC
+path: /home/zzx/datasets/VOC
 train: # train images (relative to 'path')  16551 images
   - images/train2012
   - images/train2007
@@ -18,7 +18,7 @@ val: # val images (relative to 'path')  4952 images
   - images/test2007
 test: # test images (optional)
   - images/test2007
-
+label_name: labels
 # Classes
 nc: 20  # number of classes
 names: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog',
@@ -66,12 +66,12 @@ download: |
 
   # Convert
   path = dir / f'images/VOCdevkit'
+
   for year, image_set in ('2012', 'train'), ('2012', 'val'), ('2007', 'train'), ('2007', 'val'), ('2007', 'test'):
       imgs_path = dir / 'images' / f'{image_set}{year}'
       lbs_path = dir / 'labels' / f'{image_set}{year}'
       imgs_path.mkdir(exist_ok=True, parents=True)
       lbs_path.mkdir(exist_ok=True, parents=True)
-
       image_ids = open(path / f'VOC{year}/ImageSets/Main/{image_set}.txt').read().strip().split()
       for id in tqdm(image_ids, desc=f'{image_set}{year}'):
           f = path / f'VOC{year}/JPEGImages/{id}.jpg'  # old img path

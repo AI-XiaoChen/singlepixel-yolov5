@@ -11,12 +11,14 @@ import sys
 from copy import deepcopy
 from pathlib import Path
 
+import onnx
+
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[1]  # YOLOv5 root directory
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))  # add ROOT to PATH
 # ROOT = ROOT.relative_to(Path.cwd())  # relative
-
+import numpy as np
 from models.common import *
 from models.experimental import *
 from utils.autoanchor import check_anchor_order
@@ -31,6 +33,9 @@ except ImportError:
     thop = None
 
 LOGGER = logging.getLogger(__name__)
+
+
+
 
 
 class Detect(nn.Module):
@@ -112,13 +117,19 @@ class Model(nn.Module):
             LOGGER.info(f'Overriding model.yaml anchors with anchors={anchors}')
             self.yaml['anchors'] = round(anchors)  # override yaml value
         self.model, self.save = parse_model(deepcopy(self.yaml), ch=[ch])  # model, savelist
+        # print("---self.model:", self.model)
         self.names = [str(i) for i in range(self.yaml['nc'])]  # default names 类别 index
         self.inplace = self.yaml.get('inplace', True)
 
         # Build strides, anchors
         m = self.model[-1]  # Detect()
         if isinstance(m, Detect):   # 是 Detect
-            s = 256  # 2x min stride
+            # s = 256  # 2x min stride
+            if 'size' in self.yaml:
+                s = self.yaml['size']
+            else:
+                s = 640  # 2x min stride
+
             m.inplace = self.inplace
             # print(x.shape for x in self.forward(torch.zeros(1, ch, s, s)))
             m.stride = torch.tensor([s / x.shape[-2] for x in self.forward(torch.zeros(1, ch, s, s))])  # forward
@@ -297,6 +308,9 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
             c2 = ch[f] * args[0] ** 2
         elif m is Expand:
             c2 = ch[f] // args[0] ** 2
+        elif m is Sp_EncodeAndDecode:
+            args = args
+            c2 = 3
         else:
             c2 = ch[f]
 
